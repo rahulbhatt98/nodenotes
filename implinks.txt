@@ -1,0 +1,14 @@
+https://github.com/sudheerj/reactjs-interview-questions#what-are-the-lifecycle-methods-of-react
+
+https://github.com/adrianhajdin/project_chat_application
+
+
+https://github.com/topics/react-template
+
+https://dev.to/syakirurahman/21-react-example-projects-to-learn-from-open-source-beginner-intermediate-level-2e6o
+
+https://blog.greenroots.info/16-side-project-github-repositories-you-may-find-useful
+
+
+https://betterprogramming.pub/5-new-hooks-in-react-18-300aa713cefe
+
