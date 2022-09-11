@@ -1,0 +1,177 @@
+Read Data from MongoDB
+...............
+index.js
+............
+const dbConnect = require('./mongodb');
+
+=> 1st way
+dbConnect().then((resp) => {
+	resp.find().toArray().then((data) => {
+	console.warn(data);	
+})	
+})
+
+=> 2nd way
+ const main = async () => {
+    let data = await dbConnect();
+    data = await data.find().toArray();
+    console.log(data);
+ }
+ main();
+
+................
+mongodb.js
+............
+
+const {MongoClient} = require('mongodb');
+const url = 'mongodb://localhost:27017';
+const database = "ecomm"
+const client = new MongoClient(url);
+
+async function dbConnect(){
+    let result = await client.connect();
+    let db = result.db(database);
+    return db.collection('products');
+}
+
+module.exports = dbConnect;
+..................................................................
+Insert Data From MongoDB
+
+=> single result
+
+const dbConnect = require('./mongodb');
+
+const insert = async () => {
+    const db = await dbConnect();
+    const result = await db.insert({
+        name: 'asus a70',
+        brand: 'asus',
+        price: 3200,
+        category: 'mobile'
+    })
+}
+insert();
+
+=> multiple result
+
+const dbConnect = require('./mongodb');
+
+const insert = async () => {
+    const db = await dbConnect();
+    const result = await db.insert([
+        {
+        name: 'asus a70',
+        brand: 'asus',
+        price: 3200,
+        category: 'mobile'
+    },
+    {
+        name: 'vivo a70',
+        brand: 'vivo',
+        price: 6200,
+        category: 'mobile'
+    }
+
+])
+}
+insert();
+..................................................................
+Update data in MongoDB
+
+const dbConnect = require('./mongodb');
+
+const update = async () => {
+    const db = await dbConnect();
+    let result = db.updateOne(
+        {name: 'vivo a70'},
+        {
+        $set: { name: 'vivo a70 ultra'}
+        })
+}
+update();
+
+// if we write update istead of updateOne then all record will be updated instead of single
+
+..................................................................
+Delete Data in MongoDB
+
+const dbConnect = require('./mongodb');
+
+const deleteData = async() => {
+    let data = await dbConnect();
+    let result = await data.deleteOne(
+        {
+            name : 's 60'
+        }
+    )
+}
+
+deleteData();
+
+//deleteMany used to delete multiple records
+// if we try to delete data thats not in db it give deleteCount : 0
+...................................................................
+Get Api with MongoDB
+
+const { response } = require('express');
+const express = require('express');
+const dbConnect = require('./mongodb');
+
+const app = express();
+
+app.get('/',async (req,res)=>{
+    let data = await dbConnect();
+    data = await data.find().toArray();
+    res.send(data)
+});
+
+app.listen(5000)
+..................................................................
+Post Api method
+
+const { response } = require('express');
+const express = require('express');
+const dbConnect = require('./mongodb');
+
+const app = express();
+app.use(express.json()); 
+//now we use express.json() instead of body parser
+
+app.get('/',async (req,res)=>{
+    let data = await dbConnect();
+    data = await data.find().toArray();
+    res.send(data)
+});
+
+app.post('/',async (req,res)=>{
+    let data = await dbConnect();
+    const result = await data.insertOne(req.body);
+    res.send(result)
+});
+
+app.listen(5000)
+...................................................................
+Update api 
+
+app.put('/:name',async (req,res)=>{
+    let data = await dbConnect();
+    let result = data.updateOne(
+        {name: req.params.name},
+        { $set: req.body}
+        )
+        res.send({result:"updated"})
+});
+
+...................................................................
+Delete Api Method
+
+const mongodb = require('mongodb');
+
+app.delete('/:id',async (req,res)=>{
+    let data = await dbConnect();
+    const result = await data.deleteOne({_id: new mongodb.ObjectId(req.params.id)});
+        res.send(result)
+});
+
+...................................................................

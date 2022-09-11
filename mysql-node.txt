@@ -1,0 +1,113 @@
+mysql node
+
+npm i mysql
+
+const mysql= require("mysql");
+
+const con= mysql.createConnection({
+  host:"localhost",
+  user:"root",
+  password:"",
+  database:"test"
+});
+
+// con.connect((err)=>{
+//   if(err)
+//   {
+//     console.warn("not connect")
+//   }else{
+//     console.warn("connected!!!")
+//   }
+// })
+
+con.query("select * from users",(err,result)=>{
+  if(err)
+  {
+    console.warn("some error")
+  }
+  else{
+    console.warn(result)
+  }
+})
+
+.................................................................
+Node js get api with mysql
+
+.............
+config.js
+............
+
+const mysql= require("mysql");
+
+const con= mysql.createConnection({
+  host:"localhost",
+  user:"root",
+  password:"",
+  database:"test"
+});
+con.connect((err)=>{
+    if(err) {
+        console.warn("error  is connection");
+    }
+})
+
+module.exports = con;
+................
+index.js
+................
+const express = require('express');
+const con = require("./config");
+const app = express();
+app.get("/",(req,res)=>{
+    con.query("select * from users",(err,result)=>{
+        if(err)
+        {
+          res.send("some error")
+        }
+        else{
+          res.send(result)
+        }
+      })
+});
+
+app.listen(5000)
+..................................................................
+Post api with mysql
+
+app.use(express.json());
+
+app.post("/",(req,resp)=>{
+  const data=req.body;
+  con.query("INSERT INTO users SET?",data,(error,results,fields)=>{
+    if(error) throw error;
+    resp.send(results)
+  })
+});
+
+...................................................................
+Put api with mysql
+
+app.put("/:id",(req,resp)=>{
+  const data= [req.body.name,req.params.id];
+  con.query("UPDATE users SET name = ? WHERE id = ?",
+  data,(error,results,fields)=>{
+    if(error) throw error;
+    resp.send(results)
+  })
+})
+//if affectedRows count is 0 then you have to run insert code
+..................................................................
+Delete api with mysql
+
+app.delete("/:id",(req,resp)=>{
+  con.query("DELETE FROM users WHERE id="+ req.params.id);
+  resp.send(req.params.id);
+})
+..................................................................
+
+mongoose.connection.db.listCollections({name: 'mycollectionname'})
+    .next(function(err, collinfo) {
+        if (collinfo) {
+            // The collection exists
+        }
+    });

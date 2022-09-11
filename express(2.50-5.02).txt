@@ -1,0 +1,251 @@
+ basic eg
+
+const express = require('express');
+const app = express();
+app.get('',(req,res)=>{
+    console.log(req.query.name);//localhost:5000/?name=rahul
+    res.send('Hello, this is Home Page'+req.query.name);
+});
+app.get('/about',(req,res)=>{
+    res.send('Hello, this is About Page');
+});
+
+app.listen(5000);
+...................................................................
+make html pages
+
+index.js
+........
+
+const express = require('express');
+const path = require('path');
+
+const app = express();
+const publicPath = path.join(__dirname,"public"); 
+
+// use is an express js function
+app.use(express.static(publicPath));
+
+app.listen(5000);
+
+
+public/index.html
+.................
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Home Page</title>
+    <style>
+        h1{
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Home Page</h1>
+</body>
+</html>
+...............................................................
+=> static method help in loading static content
+=> path method help in accessing the project folder
+...............................................................
+Remove extension from url
+
+const { response } = require('express');
+const express = require('express');
+const path = require('path');
+
+const app = express();
+const publicPath = path.join(__dirname,"public"); 
+
+app.get('',(_,res)=>{
+    response.sendFile(`${publicPath}/index.html`)
+})
+app.get('/about',(_,res)=>{
+    response.sendFile(`${publicPath}/about.html`)
+})
+app.listen(5000);
+..............................................................
+404 route
+
+app.get('*',(_,res)=>{
+    res.sendFile(`${publicPath}/404.html`)
+})
+................................................................
+Template Engine 
+
+=> ejs
+
+index.js 
+.........
+
+app.set('view engine','ejs'); // first param is fix second is templating engine
+
+app.get('/profile',(_,res)=>{
+    res.render('profile')
+})
+
+in views->profile.ejs
+......................
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Profile Page</title>
+</head>
+<body>
+    
+</body>
+</html>
+..................................................................
+ejs dynamically get data
+
+app.get('/profile',(_,res)=>{
+    const user={
+        name:'Peter',
+        email:'peter@test.com',
+        country:'USA'
+    }
+    res.render('profile', {user})
+})
+...............
+<body>
+    <h1>Welcome, <%= user.name %></h1>
+    <h3><%= user.email %></h3>
+    <h3><%= user.country %></h3>
+</body>
+..................................................................
+Dynamic Page
+    <ul>
+        <% user.skills.forEach((item)=>{ %>
+            <li> <%= item %> </li> // = use to print something 
+        <% }) %>
+    </ul>
+.................................................................
+common header import
+
+header is inside common->header.ejs
+
+<body>
+    <%- include('common/header'); %>// use - sign to tell load the html file.
+</body>
+.................................................................
+Middleware
+
+const express = require('express');
+const app = express();
+const reqFilter = (req, resp, next) => {
+    if (!req.query.age) {
+        resp.send("Please provide your age")
+    }
+    else if (req.query.age<18) {
+        resp.send("You are under aged")
+    }
+    else {
+        next();
+    }
+}
+
+app.use(reqFilter);// application middelware
+
+app.get('/', (res, resp) => {
+    resp.send('Welcome to Home page')
+});
+
+app.get('/users', (res, resp) => {
+    resp.send('Welcome to Users page')
+});
+app.listen(5000)
+...................................................................
+Middelware types
+
+=> Application-level middelware
+=> Router-level middelware
+=> Error-handling middelware
+=> Built-in middelware
+=> Third-party middelware
+..................................................................
+Route Level Middelware
+
+app.get('/users',reqFilter,(res, resp) => {
+    resp.send('Welcome to Users page')
+}); // middelware apply only to single route
+
+=> create middelware in separate file and import
+.................................................
+
+const reqFilter = require('./middelware');
+
+=> apply middleware to multiple route once
+............................................
+
+const express = require('express');
+const reqFilter = require('./middelware');
+const app = express();
+const route = express.Router();
+
+route.use(reqFilter);
+app.get('/', (res, resp) => {
+    resp.send('Welcome to Home page')
+});
+route.get('/users', (res, resp) => {
+    resp.send('Welcome to Users page')
+});
+route.get('/contact', (res, resp) => {
+    resp.send('Welcome to Contact page')
+});
+app.use('/',route)
+app.listen(5000)
+..................................................................
+Install mongodb
+
+=> show dbs(to show databases)
+
+.................................................................
+What is mongodb?
+
+-> MongoDB is NOSQL database
+-> tha data stored in collection not in tables
+-> collection dont't have rows and columns
+-> data is stored in the form of objects
+..................................................................
+mongo commands
+
+-> show dbs
+-> use <databasename> //database created
+-> db.createCollection('videos')
+-> show collections
+-> db.videos.drop() // drop here is collection name
+-> db.dropDatabase()
+.................................................................
+CRUD operations with mongodb
+
+-> db.products.insertOne({
+	name: 'm 40',
+	price: 20
+   })
+
+-> db.products.find() // view records or collection
+-> db.products.updateOne({name:"m 40"},{$set:{brand:apple}})
+-> db.products.deleteOne({brand:"apple"})
+
+..................................................................
+Connect node with MongoDB
+
+const {MongoClient} = require('mongodb');
+const url = 'mongodb://localhost:27017';
+const database = "ecomm"
+
+const client = new MongoClient(url);
+
+async function getData(){
+    let result = await client.connect();
+    let db = result.db(database);
+    let collection = db.collection('products');
+    let response = await collection.find({}).toArray()// find({name:''s 20})// gave only single matching result
+    console.log(response);
+}
+
+getData();
+
+.................................................................

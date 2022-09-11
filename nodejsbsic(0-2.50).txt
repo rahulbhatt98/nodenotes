@@ -1,0 +1,210 @@
+>> Intro
+> node js is server environment
+> free and open-source
+> use v8 engine to execute code
+
+......................................................
+>> Fs(filesystem Module)
+
+const fs = require('fs')
+
+fs.writeFileSync("hello.txt","hello")
+
+..............................................................
+
+Global vs non global module
+
+> global module are those whice did not need to import
+> non global module need to import before use
+..............................................................
+1. __dirname -> gives directory name
+2. __filename -> gives filename with directory
+
+...............................................................
+for single module import syntex is
+
+const fs = require('fs').writeFileSync
+.............................................................
+app.js
+
+module.exports={
+    x: 10,
+    y:20,
+    z: function(){
+        return 10
+    }
+};
+
+const app = require('./App.js');
+
+console.log(app.z())
+
+...............................................................
+http Intro
+
+handle the request and response from client and server.
+
+const http = require('http')
+
+http.createServer((req,resp)=>{
+resp.write("<h1>hello welcome</h1>");
+resp.end()
+}).listen
+
+...................................................................
+node js is single threaded runs single task at time
+
+benefits of single threaded why node js is faster?(check)
+...................................................................
+.gitignore file
+
+/node_modules
+
+...................................................................
+1.25hrs ^
+        | 
+..................................................................
+node js is async
+
+..................................................................
+
+200, 201, 404,500 (all meaning)
+
+...................................................................
+
+.........
+data.js
+.........
+
+const data = {
+    name: 'Rahul Bhatt',
+    email: 'rahul98@gmail.com'
+}
+
+module.exports= data;
+
+...........
+index.js
+........
+
+const http = require('http')
+const data = require('./data')
+
+http.createServer((req,resp)=>{
+resp.writeHead(200,{'Content-Type':'application/json'});
+resp.write(JSON.stringify(data));
+resp.end()
+}).listen(4500);
+
+...................................................................
+
+=> console.log(process.argv)
+In process.argv first two output is fixed it shows node path and project path.
+
+we can also get paticular input by using process.argv[3] by passing index no.
+
+..................................................................
+
+fs.unlinkSync(<filename>)
+
+to remove file
+
+..................................................................
+create file at particular folder
+
+const fs = require('fs');
+const path = require('path');
+const dirPath = path.join(__dirname, 'files');
+for(i=0;i<5;i++){
+fs.writeFileSync(`${dirPath}/hello${i}.txt`,"a simple text file")
+}
+...................................................................
+
+fs.readdir(dirPath,(err,files) => {
+	files.forEach((item)=>{
+		console.log(item)
+	})
+})
+
+hello0.txt
+hello1.txt
+hello2.txt
+hello3.txt
+
+...................................................................
+CRUD with file system
+
+-> craete done
+fs.writeFileSync(filePath,"file context");
+-> read file
+const path = require('path');
+const dirPath = path.join(__dirname, 'files');
+const filePath = `${dirPath}/apple.txt'; 
+fs.readFile(filePath,'utf8',(err,item)=>{
+	console.log(item)
+})
+-> update file
+fs.appendFile(filePath, 'new text that we want to add', (err) =>{
+	if(!err) console.log('file updated')
+})
+-> rename file
+fs.rename(filePath,`${dirPath}/fruit.txt`,()=>{
+ if(!err) console.log('filename is updated')
+})
+-> delete 
+fs.unlinkSync(`${dirPath}/apple.txt`)
+...................................................................
+buffer => buffer is a temporary memory location when we perform operations on file system node needs some memory.
+..............................................................
+2.19
+...........................................
+Asynchronous basic
+
+drawback eg
+let a=10
+let b=0
+
+setTimeout(()=>{
+	b=20
+},2000)
+
+console.log(a+b)
+
+output: 10
+...................................................................
+Handle asynchronous data in node js
+
+let a=10
+let b=0
+
+let waitingData = new Promise((resolve, reject)=>{
+	setTimeout(()=>{
+		resolve(30)
+	},2000)
+})
+
+waitingData.then((data)=>{
+	b=data;
+	console.log(a+b)
+})
+................................................................
+How node js works
+
+call stack -> node api -> callback queue     (event loop)
+
+console.log('starting up')
+
+setTimeout(()=>{
+	console.log('2 sec')
+}, 2000)
+
+setTimeout(()=>{
+	console.log('0 sec')
+}, 0)
+
+console.log('finishing up')
+
+setTimeout runs after main() finish thats why 2 sec print after finishing up. first setTimeout goes on node api then callback queue after finishing main it goes to call stack.
+
+...............................................................
+2.50

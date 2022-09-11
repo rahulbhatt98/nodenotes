@@ -1,0 +1,203 @@
+CRUD with mongoose
+
+const mongoose = require('mongoose');
+
+mongoose.connect("mongodb://localhost:27017/ecomm")
+
+const productSchema = new mongoose.Schema({
+    name: String,
+    price: Number,
+    brand: String,
+    category: String
+})
+
+const saveInDb = async () => {
+    const Product = mongoose.model('products', productSchema);
+    let data = new Product({
+        name: 'max 10',
+        price: 2000,
+        brand: 'maxxy',
+        category: 'mobile'
+    });
+
+    const result = await data.save();
+    console.log(result);
+}
+
+const updateInDB =async  () => {
+    const Product = mongoose.model('products', productSchema);
+    let data =await  Product.updateOne(
+        { name: "max pro 6" },
+        {
+            $set: { price: 550,name:'max pro 660' }
+        }
+    )
+    console.log(data)
+}
+
+const deleteInDB = async ()=>{
+    const Product = mongoose.model('products', productSchema);
+    let data = await Product.deleteOne({name:'max pro 660'})
+    console.log(data);
+}
+const findInDB = async ()=>{
+    const Product = mongoose.model('products', productSchema);
+    let data = await Product.find({name:'max 10'})
+    console.log(data);
+}
+
+findInDB();
+..................................................................
+CRUD API with Mongoose
+
+...........
+config.js
+...........
+
+const mongoose = require('mongoose');
+mongoose.connect("mongodb://localhost:27017/ecomm");
+
+............
+product.js
+............
+const mongoose = require('mongoose');
+const productSchema= new mongoose.Schema({
+    name:String,
+    price:Number,
+    brand:String,
+    category:String
+});
+
+module.exports= mongoose.model("products",productSchema);
+
+.............
+index.js
+.............
+
+const express = require('express');
+require("./config");
+const Product = require('./product');
+const app = express();
+
+app.use(express.json());
+app.post("/create", async (req, resp) => {
+    let data = new Product(req.body);
+    const result = await data.save();
+    resp.send(result);
+});
+
+app.get("/list", async (req, resp) => {
+    let data = await Product.find();
+    resp.send(data);
+})
+
+app.delete("/delete/:_id", async (req, resp) => {
+    console.log(req.params)
+    let data = await Product.deleteOne(req.params);
+    resp.send(data);
+})
+
+
+app.put("/update/:_id",async (req, resp) => {
+    console.log(req.params)
+    let data = await Product.updateOne(
+        req.params,
+        {$set: req.body}
+    );
+    resp.send(data);
+})
+
+app.listen(5000)
+
+.................................................................
+Search API in nodejs
+
+const express = require('express');
+require("./config");
+const Product = require('./product');
+const app = express();
+
+app.use(express.json());
+
+app.get("/search/:key",async (req,resp)=>{
+    let data = await Product.find(
+        {
+            "$or":[
+                {name:{$regex:req.params.key}},
+                {brand:{$regex:req.params.key}}
+            ]
+        }
+    )
+    resp.send(data);
+
+})
+
+app.listen(5000)
+// here $or use for multi search if we want to search both on name and brand also
+.................................................................
+Upload File in Node Js
+
+const express = require('express');
+const multer = require('multer');
+
+const app = express();
+
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, 'uploads')
+        },
+        filename: function (req, file, cb) {
+            cb(null, file.fieldname + "-" + Date.now() + ".jpg")
+        }
+    })
+}).single('file_name');
+
+app.post("/upload", upload, (req, resp) => {
+    resp.send("file upload")
+});
+
+app.listen(5000)
+
+// cb here is callback
+// file_name is req field
+//without multer we can also upload file using node createReadStream function but this fun is complex multer is easy to use
+
+..................................................................
+OS Module in node js
+
+const os = require('os')
+console.log(os.arch());// tells architecture it is 64 or 32 bit
+console.log(os.freemem()/(1024*1024*1024));//to convert byte into gb it tells how much memory free
+console.log(os.totalmem()/(1024*1024*1024));///total ram of system
+console.log(os.hostname());//check system name
+console.log(os.platform());//check platform
+console.log(os.userInfo());// gives username, homedir
+..................................................................
+Events and Event Emitter in Node js
+
+// event emitter means to generate or produce
+const express = require('express');
+const EventEmitter = require("events");
+// EventEmitter is basically a class that's why we take first letter capital
+const app = express();
+const event= new EventEmitter();
+
+let count = 0;
+
+event.on("countAPI", ()=>{
+    count++;
+    console.log("event called", count)
+})
+app.get("/", (req, res)=>{
+    res.send("api called");
+    event.emit("countAPI");
+})
+app.listen(5000);
+..............................................................
+
+REPL(Read-Eval-Print-Loop)
+
+.editor to write freely
+
+..................................................................
